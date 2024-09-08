@@ -43,6 +43,7 @@ module.exports = {
             currentTime: 0,
             isPlaying: false,
           },
+          scoreboard: [],
           currentRound: [],
           roundFinished: false,
           gameState: "Lobby",

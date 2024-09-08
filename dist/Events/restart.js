@@ -36,11 +36,13 @@ module.exports = {
                         currentTime: 0,
                         isPlaying: false,
                     },
+                    scoreboard: [],
                     currentRound: [],
                     roundFinished: false,
                     gameState: "Lobby",
                 };
                 parties.set(uid, newParty);
+                player.score = 0;
                 socket.leave(`party#${party.id}`);
                 socket.join(`party#${newParty.id}`);
                 socket.emit("response#restart", newParty);
@@ -51,6 +53,7 @@ module.exports = {
                     const newParty = parties.get(payload.newParty);
                     if (newParty) {
                         newParty.players.push(player);
+                        player.score = 0;
                         socket.leave(`party#${party.id}`);
                         socket.emit("response#restart", newParty);
                         socket.join(`party#${newParty.id}`);

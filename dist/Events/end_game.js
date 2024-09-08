@@ -16,6 +16,7 @@ module.exports = {
             const player = party.players.find(p => p.socket === socket.id);
             if (player && player.id === party.host.id) {
                 party.gameState = "Scoreboard";
+                party.scoreboard = party.players;
                 io.to(`party#${party.id}`).emit("update_party", party);
             }
         }
