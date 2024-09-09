@@ -14,12 +14,13 @@ module.exports = {
         const party: PartyType | undefined = parties.get(payload.id);
         
         if(party) {
-
             const player : PlayerType | undefined = party.players.find(p => p.socket === socket.id);
-
             if(player) {
                 if(!party.currentRound.includes(player) && !party.roundFinished && party.currentTrack.isPlaying) {
                     party.currentRound.push(player)
+                    party.currentRoundScore[player.id] = 0;
+                    console.log(party);
+                    
                     io.to(`party#${party.id}`).emit("update_party", party)
                 }
             }

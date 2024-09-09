@@ -17,6 +17,8 @@ module.exports = {
             if (player) {
                 if (!party.currentRound.includes(player) && !party.roundFinished && party.currentTrack.isPlaying) {
                     party.currentRound.push(player);
+                    party.currentRoundScore[player.id] = 0;
+                    console.log(party);
                     io.to(`party#${party.id}`).emit("update_party", party);
                 }
             }

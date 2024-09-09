@@ -59,10 +59,11 @@ module.exports = {
             },
             scoreboard: [],
             currentRound: [],
+            currentRoundScore: {},
             roundFinished: false,
             gameState: "Lobby",
         }
-
+        
         parties.set(uid, party);
         socket.join(`party#${party.id}`)
         socket.emit("response#host_game", party)

@@ -5,7 +5,8 @@ import { PlayerType } from "../Types/PlayerType";
 type StartingGameType = {
     id: string,
     playerId: string,
-    amount: number
+    amount: number,
+    inRound: boolean,
 }
 
 module.exports = {
@@ -18,12 +19,19 @@ module.exports = {
             const player : PlayerType | undefined = party.players.find(p => p.socket === socket.id);
 
             if(player && player.id === party.host.id) {
-                party.players = party.players.map(p => {
-                    if(p.id === payload.playerId) {
-                        p.score += payload.amount > 0 ? 1 : -1;
-                    }
-                    return p
-                })
+
+                if(!payload.inRound) {
+                    party.players = party.players.map(p => {
+                        if(p.id === payload.playerId) {
+                            p.score += payload.amount > 0 ? 1 : -1;
+                        }
+                        return p
+                    })
+                } else {
+                    party.currentRoundScore[payload.playerId] += payload.amount;
+                    console.log(party.currentRoundScore[payload.playerId], payload.amount);
+                    
+                }
 
                 party.players = party.players.sort((a, b) => b.score - a.score)
 

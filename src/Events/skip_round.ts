@@ -16,9 +16,8 @@ module.exports = {
             const player : PlayerType | undefined = party.players.find(p => p.socket === socket.id);
 
             if(player && player.id === party.host.id) {
-                party.players = party.players.sort((a, b) => b.score - a.score)
-                party.currentTrack.isPlaying = false;
-                party.roundFinished = true;
+                party.currentRound = [];
+                party.currentRoundScore = {};
                 io.to(`party#${party.id}`).emit("update_party", party)
             }
         } 
