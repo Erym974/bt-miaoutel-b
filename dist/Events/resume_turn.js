@@ -29,6 +29,7 @@ module.exports = {
                 party.roundFinished = false;
                 party.currentTrack.isPlaying = true;
                 party.currentRound = [];
+                party.players = party.players.sort((a, b) => b.score - a.score);
                 io.to(`party#${party.id}`).emit("update_party", party);
             }
         }
