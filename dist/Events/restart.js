@@ -12,37 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const short_unique_id_1 = __importDefault(require("short-unique-id"));
+const createParty_1 = __importDefault(require("../Functions/createParty"));
 module.exports = {
     exec: (io, socket, payload, parties, players) => __awaiter(void 0, void 0, void 0, function* () {
         const party = parties.get(payload.id);
         if (party) {
             const player = party.players.find((p) => p.socket === socket.id);
             if (player && player.id === party.host.id) {
-                const uidGenerator = new short_unique_id_1.default({ length: 6 });
-                let uid = uidGenerator.rnd();
-                while (parties.has(uid)) {
-                    uid = uidGenerator.rnd();
-                }
-                uid = uid.toUpperCase();
-                const newParty = {
-                    id: uid,
-                    host: player,
-                    hostLastConnection: -1,
-                    players: [player],
-                    currentTrack: {
-                        url: "",
-                        duration: 0,
-                        currentTime: 0,
-                        isPlaying: false,
-                    },
-                    scoreboard: [],
-                    currentRound: [],
-                    currentRoundScore: {},
-                    roundFinished: false,
-                    gameState: "Lobby",
-                };
-                parties.set(uid, newParty);
+                const newParty = (0, createParty_1.default)(player, parties);
+                parties.set(newParty.id, newParty);
                 player.score = 0;
                 socket.leave(`party#${party.id}`);
                 socket.join(`party#${newParty.id}`);

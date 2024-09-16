@@ -9,16 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const PartyType_1 = require("../Types/PartyType");
 module.exports = {
-    exec: (io, socket, payload, parties) => __awaiter(void 0, void 0, void 0, function* () {
-        const party = parties.get(payload);
-        if (!party)
-            return socket.emit("response#get_player", null);
-        party.players.map((player) => {
-            if (player.socket === socket.id) {
-                return socket.emit("response#get_player", player);
+    exec: (io, socket, payload, parties, players) => __awaiter(void 0, void 0, void 0, function* () {
+        const party = parties.get(payload.id);
+        if (party && party.mode === PartyType_1.GameMode.Team) {
+            const player = party.players.find(p => p.socket === socket.id);
+            if (player) {
+                const newTeam = payload.newTeam;
+                party.teams.forEach((team) => {
+                    if (team.players.includes(player.id)) {
+                        team.players = team.players.filter(p => p !== player.id);
+                    }
+                });
+                party.teams[newTeam].players.push(player.id);
+                io.to(`party#${party.id}`).emit("update_party", party);
             }
-        });
-        return socket.emit("response#get_player", null);
+        }
     })
 };

@@ -1,17 +1,11 @@
 import ShortUniqueId from "short-unique-id";
-import { PartyType } from "../Types/PartyType"
+import { GameMode, GameState, PartyType } from "../Types/PartyType"
 import { PlayerType } from "../Types/PlayerType";
 import { ProfileType } from "../Types/ProfileType";
+import createParty from "../Functions/createParty";
 
 module.exports = {
     exec: async (io: any, socket: any, payload: ProfileType, parties: Map<string, PartyType>, players: Map<string, PlayerType>) => {
-
-        const uidGenerator = new ShortUniqueId({ length: 6 });
-        let uid = uidGenerator.rnd();
-
-        while(parties.has(uid)) {
-            uid = uidGenerator.rnd();
-        }
 
         const player: PlayerType | undefined = players.get(socket.id);
 
@@ -34,7 +28,6 @@ module.exports = {
 
         if (match) {
             const number = parseInt(match[1], 10);
-            // Vérifier que le nombre est dans la plage valide
             if (number >= 1 && number <= maxPicture) {
                 player.profile = payload.profile;
             } else {
@@ -44,27 +37,9 @@ module.exports = {
             player.profile = `${process.env.BACK_URL}/profile_1.jpg`;
         }
 
-        uid = uid.toUpperCase();
-
-        const party = {
-            id: uid,
-            host: player,
-            hostLastConnection: -1,
-            players: [player],
-            currentTrack: {
-                url: "",
-                duration: 0,
-                currentTime: 0,
-                isPlaying: false,
-            },
-            scoreboard: [],
-            currentRound: [],
-            currentRoundScore: {},
-            roundFinished: false,
-            gameState: "Lobby",
-        }
+        const party = createParty(player, parties);
         
-        parties.set(uid, party);
+        parties.set(party.id, party);
         socket.join(`party#${party.id}`)
         socket.emit("response#host_game", party)
 

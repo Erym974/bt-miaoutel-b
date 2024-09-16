@@ -9,13 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const PartyType_1 = require("../Types/PartyType");
 module.exports = {
     exec: (io, socket, payload, parties, players) => __awaiter(void 0, void 0, void 0, function* () {
         const party = parties.get(payload.id);
         if (party) {
             const player = party.players.find(p => p.socket === socket.id);
             if (player && player.id === party.host.id) {
-                party.gameState = "Scoreboard";
+                party.gameState = PartyType_1.GameState.Scoreboard;
                 party.scoreboard = party.players;
                 io.to(`party#${party.id}`).emit("update_party", party);
             }

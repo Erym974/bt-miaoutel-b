@@ -12,14 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const short_unique_id_1 = __importDefault(require("short-unique-id"));
+const createParty_1 = __importDefault(require("../Functions/createParty"));
 module.exports = {
     exec: (io, socket, payload, parties, players) => __awaiter(void 0, void 0, void 0, function* () {
-        const uidGenerator = new short_unique_id_1.default({ length: 6 });
-        let uid = uidGenerator.rnd();
-        while (parties.has(uid)) {
-            uid = uidGenerator.rnd();
-        }
         const player = players.get(socket.id);
         if (!player) {
             return;
@@ -36,7 +31,6 @@ module.exports = {
         const match = payload.profile.match(regex);
         if (match) {
             const number = parseInt(match[1], 10);
-            // Vérifier que le nombre est dans la plage valide
             if (number >= 1 && number <= maxPicture) {
                 player.profile = payload.profile;
             }
@@ -47,25 +41,8 @@ module.exports = {
         else {
             player.profile = `${process.env.BACK_URL}/profile_1.jpg`;
         }
-        uid = uid.toUpperCase();
-        const party = {
-            id: uid,
-            host: player,
-            hostLastConnection: -1,
-            players: [player],
-            currentTrack: {
-                url: "",
-                duration: 0,
-                currentTime: 0,
-                isPlaying: false,
-            },
-            scoreboard: [],
-            currentRound: [],
-            currentRoundScore: {},
-            roundFinished: false,
-            gameState: "Lobby",
-        };
-        parties.set(uid, party);
+        const party = (0, createParty_1.default)(player, parties);
+        parties.set(party.id, party);
         socket.join(`party#${party.id}`);
         socket.emit("response#host_game", party);
     })

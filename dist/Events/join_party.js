@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const PartyType_1 = require("../Types/PartyType");
 module.exports = {
     exec: (io, socket, payload, parties, players) => __awaiter(void 0, void 0, void 0, function* () {
         const party = parties.get(payload.id);
@@ -41,6 +42,14 @@ module.exports = {
                 player.profile = `${process.env.BACK_URL}/profile_1.jpg`;
             }
             party.players.push(player);
+            if (party.mode === PartyType_1.GameMode.Team) {
+                if (party.teams[0].players.length <= party.teams[1].players.length) {
+                    party.teams[0].players.push(player.id);
+                }
+                else {
+                    party.teams[1].players.push(player.id);
+                }
+            }
             socket.join(`party#${party.id}`);
             socket.broadcast.to(`party#${party.id}`).emit('update_party', party);
         }

@@ -16,30 +16,24 @@ module.exports = {
         if (party) {
             const player = party.players.find(p => p.socket === socket.id);
             if (player && player.id === party.host.id) {
-                if (!payload.inRound) {
-                    party.players = party.players.map(p => {
-                        if (p.id === payload.playerId) {
-                            p.score += payload.amount > 0 ? 1 : -1;
-                        }
-                        return p;
-                    });
+                switch (payload.mode) {
+                    case PartyType_1.GameMode.Team:
+                        party.mode = PartyType_1.GameMode.Team;
+                        // repartir les joueurs en 2 équipes
+                        const players = party.players;
+                        const first_team = players.slice(0, players.length / 2);
+                        const second_team = players.slice(players.length / 2);
+                        party.teams[0].players = first_team.map(player => player.id);
+                        party.teams[1].players = second_team.map(player => player.id);
+                        break;
+                    default:
+                        party.mode = PartyType_1.GameMode.Individual;
+                        party.teams[0] = Object.assign(Object.assign({}, party.teams[0]), { players: [], score: 0 });
+                        party.teams[1] = Object.assign(Object.assign({}, party.teams[1]), { players: [], score: 0 });
+                        break;
                 }
-                else {
-                    party.currentRoundScore[payload.playerId] += payload.amount;
-                }
-                if (party.mode === PartyType_1.GameMode.Team) {
-                    party.teams.forEach((team) => {
-                        team.score = 0;
-                        team.players.forEach(playerId => {
-                            const player = party.players.find(p => p.id === playerId);
-                            if (player) {
-                                team.score += player.score;
-                            }
-                        });
-                    });
-                }
-                party.players = party.players.sort((a, b) => b.score - a.score);
                 io.to(`party#${party.id}`).emit("update_party", party);
+                console.log(party);
             }
         }
     })

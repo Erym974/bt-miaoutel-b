@@ -1,6 +1,7 @@
 import ShortUniqueId from "short-unique-id";
-import { PartyType } from "../Types/PartyType"
+import { GameMode, PartyType } from "../Types/PartyType"
 import { PlayerType } from "../Types/PlayerType";
+import { TeamType } from "../Types/TeamType";
 
 type StartingGameType = {
     id: string,
@@ -29,8 +30,18 @@ module.exports = {
                     })
                 } else {
                     party.currentRoundScore[payload.playerId] += payload.amount;
-                    console.log(party.currentRoundScore[payload.playerId], payload.amount);
-                    
+                }
+
+                if(party.mode === GameMode.Team) {
+                    party.teams.forEach((team: TeamType) => {
+                        team.score = 0;
+                        team.players.forEach(playerId => {
+                            const player = party.players.find(p => p.id === playerId);
+                            if(player) {
+                                team.score += player.score;
+                            }
+                        })
+                    })
                 }
 
                 party.players = party.players.sort((a, b) => b.score - a.score)

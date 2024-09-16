@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const PartyType_1 = require("../Types/PartyType");
 module.exports = {
     exec: (io, socket, payload, parties, players) => __awaiter(void 0, void 0, void 0, function* () {
         const party = parties.get(payload.id);
@@ -24,6 +25,17 @@ module.exports = {
                             return p;
                         });
                     }
+                }
+                if (party.mode === PartyType_1.GameMode.Team) {
+                    party.teams.forEach((team) => {
+                        team.score = 0;
+                        team.players.forEach(playerId => {
+                            const player = party.players.find(p => p.id === playerId);
+                            if (player) {
+                                team.score += player.score;
+                            }
+                        });
+                    });
                 }
                 party.currentRoundScore = {};
                 party.roundFinished = false;

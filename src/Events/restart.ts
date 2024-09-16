@@ -1,6 +1,7 @@
 import ShortUniqueId from "short-unique-id";
 import { PartyType } from "../Types/PartyType";
 import { PlayerType } from "../Types/PlayerType";
+import createParty from "../Functions/createParty";
 
 type RestartGameType = {
   id: string;
@@ -23,34 +24,10 @@ module.exports = {
       );
 
       if (player && player.id === party.host.id) {
-        const uidGenerator = new ShortUniqueId({ length: 6 });
-        let uid = uidGenerator.rnd();
 
-        while (parties.has(uid)) {
-          uid = uidGenerator.rnd();
-        }
+        const newParty = createParty(player, parties);
 
-        uid = uid.toUpperCase();
-
-        const newParty = {
-          id: uid,
-          host: player,
-          hostLastConnection: -1,
-          players: [player],
-          currentTrack: {
-            url: "",
-            duration: 0,
-            currentTime: 0,
-            isPlaying: false,
-          },
-          scoreboard: [],
-          currentRound: [],
-          currentRoundScore: {},
-          roundFinished: false,
-          gameState: "Lobby",
-        };
-
-        parties.set(uid, newParty);
+        parties.set(newParty.id, newParty);
         player.score = 0;
         socket.leave(`party#${party.id}`);
         socket.join(`party#${newParty.id}`);

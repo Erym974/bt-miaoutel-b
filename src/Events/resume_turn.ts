@@ -1,6 +1,7 @@
 import ShortUniqueId from "short-unique-id";
-import { PartyType } from "../Types/PartyType"
+import { GameMode, PartyType } from "../Types/PartyType"
 import { PlayerType } from "../Types/PlayerType";
+import { TeamType } from "../Types/TeamType";
 
 type EndTurnType = {
     id: string
@@ -26,6 +27,19 @@ module.exports = {
                         });
                     }
                 }
+
+                if(party.mode === GameMode.Team) {
+                    party.teams.forEach((team: TeamType) => {
+                        team.score = 0;
+                        team.players.forEach(playerId => {
+                            const player = party.players.find(p => p.id === playerId);
+                            if(player) {
+                                team.score += player.score;
+                            }
+                        })
+                    })
+                }
+
                 party.currentRoundScore = {};
                 party.roundFinished = false;
                 party.currentTrack.isPlaying = true;

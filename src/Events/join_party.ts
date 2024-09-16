@@ -1,5 +1,5 @@
 import ShortUniqueId from "short-unique-id";
-import { PartyType } from "../Types/PartyType"
+import { GameMode, PartyType } from "../Types/PartyType"
 import { PlayerType } from "../Types/PlayerType";
 import { ProfileType } from "../Types/ProfileType";
 
@@ -49,6 +49,14 @@ module.exports = {
             }
 
             party.players.push(player);
+
+            if(party.mode === GameMode.Team) {
+                if(party.teams[0].players.length <= party.teams[1].players.length ) {
+                    party.teams[0].players.push(player.id)
+                } else {
+                    party.teams[1].players.push(player.id)
+                }
+            }
 
             socket.join(`party#${party.id}`)
             socket.broadcast.to(`party#${party.id}`).emit('update_party', party);

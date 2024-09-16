@@ -1,5 +1,5 @@
 import ShortUniqueId from "short-unique-id";
-import { PartyType } from "../Types/PartyType"
+import { GameState, PartyType } from "../Types/PartyType"
 import { PlayerType } from "../Types/PlayerType";
 
 type EndGameType = {
@@ -16,7 +16,7 @@ module.exports = {
             const player : PlayerType | undefined = party.players.find(p => p.socket === socket.id);
 
             if(player && player.id === party.host.id) {
-                party.gameState = "Scoreboard"
+                party.gameState = GameState.Scoreboard;
                 party.scoreboard = party.players;
                 io.to(`party#${party.id}`).emit("update_party", party)
             }
